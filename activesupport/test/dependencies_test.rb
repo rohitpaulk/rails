@@ -200,6 +200,7 @@ class DependenciesTest < ActiveSupport::TestCase
       assert_raise(NameError) { NoModule::DoesNotExist }
       assert_raise(NameError) { A::DoesNotExist }
       assert_raise(NameError) { A::B::DoesNotExist }
+      assert_raise(NameError) { A::B::C }
     end
   end
 
