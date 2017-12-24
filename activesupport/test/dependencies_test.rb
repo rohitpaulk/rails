@@ -196,11 +196,18 @@ class DependenciesTest < ActiveSupport::TestCase
 
   def test_non_existing_const_raises_name_error
     with_autoloading_fixtures do
-      assert_raise(NameError) { DoesNotExist }
-      assert_raise(NameError) { NoModule::DoesNotExist }
-      assert_raise(NameError) { A::DoesNotExist }
-      assert_raise(NameError) { A::B::DoesNotExist }
-      assert_raise(NameError) { A::B::C }
+      # assert_raise(NameError) { DoesNotExist }
+      # assert_raise(NameError) { NoModule::DoesNotExist }
+      # assert_raise(NameError) { A::DoesNotExist }
+      # assert_raise(NameError) { A::B::DoesNotExist }
+      A::B::C
+      # begin
+      #   A::B::C
+      #   A::B::C
+      # rescue NameError => e
+      #   puts "NameError"
+      # end
+      # assert_raise(NameError) { A::B::C }
     end
   end
 

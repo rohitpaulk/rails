@@ -189,8 +189,11 @@ module ActiveSupport #:nodoc:
       end
 
       def const_missing(const_name)
+        puts "const_missing(#{const_name.inspect}) from #{self.inspect}"
         from_mod = anonymous? ? guess_for_anonymous(const_name) : self
         Dependencies.load_missing_constant(from_mod, const_name)
+      ensure
+        puts ""
       end
 
       # We assume that the name of the module reflects the nesting
@@ -341,6 +344,7 @@ module ActiveSupport #:nodoc:
     end
 
     def require_or_load(file_name, const_path = nil)
+      puts "require_or_load(#{file_name.inspect})"
       file_name = $` if file_name =~ /\.rb\z/
       expanded = File.expand_path(file_name)
       return if loaded.include?(expanded)
@@ -482,6 +486,8 @@ module ActiveSupport #:nodoc:
     # it is not possible to load the constant into from_mod, try its parent
     # module using +const_missing+.
     def load_missing_constant(from_mod, const_name)
+      puts " -- load_missing_constant(#{from_mod.inspect}, #{const_name.inspect})"
+
       unless qualified_const_defined?(from_mod.name) && Inflector.constantize(from_mod.name).equal?(from_mod)
         raise ArgumentError, "A copy of #{from_mod} has been removed from the module tree but is still active!"
       end
@@ -492,6 +498,7 @@ module ActiveSupport #:nodoc:
       file_path = search_for_file(path_suffix)
 
       if file_path
+        puts "    -- Found file path: #{file_path.inspect}"
         expanded = File.expand_path(file_path)
         expanded.sub!(/\.rb\z/, "".freeze)
 
@@ -503,9 +510,11 @@ module ActiveSupport #:nodoc:
           return from_mod.const_get(const_name)
         end
       elsif mod = autoload_module!(from_mod, const_name, qualified_name, path_suffix)
+        puts "    -- Autoloaded module"
         return mod
       elsif (parent = from_mod.parent) && parent != from_mod &&
             ! from_mod.parents.any? { |p| p.const_defined?(const_name, false) }
+        puts "    -- Load upwards"
         # If our parents do not have a constant named +const_name+ then we are free
         # to attempt to load upwards. If they do have such a constant, then this
         # const_missing must be due to from_mod::const_name, which should not
